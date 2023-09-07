@@ -1,0 +1,18 @@
+{
+  "type": "sequence",
+  "name": "pickup_random",
+  "children": [
+    {
+      "behaviour": "SearchObject",
+      "name": "searchobject_random",
+      "colors": "random"
+    },
+    {
+      "behaviour": "StackCube",
+      "name": "pickandplace_random",
+      "destination_plane": null,
+      "place_object": false
+
+    }
+  ]
+}

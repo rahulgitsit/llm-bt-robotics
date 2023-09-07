@@ -1,0 +1,20 @@
+{
+  "type": "sequence",
+  "name": "sort_and_place",
+  "children": [
+    {
+      "behaviour": "MoveToPlane",
+      "name": "movetoplane_sort"
+    },
+    {
+      "behaviour": "SearchObject",
+      "name": "searchobject_sort",
+      "colors": null,
+      "store_pos": false
+    },
+    {
+      "behaviour": "PickAndPlace",
+      "name": "pickandplace_sort"
+    }
+  ]
+}

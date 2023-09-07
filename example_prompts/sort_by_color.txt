@@ -1,0 +1,44 @@
+1.  Pick and place cubes on the planes with the same colour.
+{
+  "type": "sequence"
+  "name": "sort_and_place",
+  "children": [
+    {
+      "behaviour": "MoveToPlane",
+      "name": "movetoplane_sort",
+    },
+    {
+      "behaviour": "SearchObject",
+      "name": "searchobject_sort",
+      "colors": null,
+      “store_pos”: false,
+    },
+    {
+      "behaviour": "PickAndPlace",
+      "name": "pickandplace_sort",
+    }
+  ]
+}
+
+2. Sort all the cubes by colors please. Thank you.
+
+{
+  "type": "sequence"
+  "name": "sort_and_place",
+  "children": [
+    {
+      "behaviour": "MoveToPlane",
+      "name": "movetoplane_sort",
+    },
+    {
+      "behaviour": "SearchObject",
+      "name": "searchobject_sort",
+      "colors": "”,
+      “store_pos”: false,
+    },
+    {
+      "behaviour": "PickAndPlace",
+      "name": "pickandplace_sort",
+    }
+  ]
+}

@@ -1,6 +1,3 @@
-from time import sleep
-
-
 class Processor:
 
     def __init__(self, sim, actuators, sensors, detectors):
@@ -21,8 +18,8 @@ class Processor:
         pos[2] = 0.3
         self.actuators.move_to_pose(pos)
         color = self.detectors.find_color()
-        pos_rounded = [round(x, 4) for x in pos]
-        return color, pos_rounded
+        # cords = self.sim.getObjectPosition(plate, self.sim.handle_world)
+        return color, pos
 
     def search_for_object(self, colors):
         if not self.started:
@@ -47,28 +44,17 @@ class Processor:
             self.last_pos[2] = pos[0][2]
 
             if temp is not None or self.actuators.move_to_target(self.last_pos) is not None:
-                return color, self.last_pos
+                pos_rounded = [round(x,4) for x in self.last_pos]
+                return color, pos_rounded
         else:
             self.last_pos[1] += self.increment
         return False, False
 
-    def pick_and_place(self, color, plane_pos):
-        if self.actuators.pickup_object(self.sensors):
-            destination = plane_pos[color]
-            self.actuators.place_object(destination)
+    def pick_up(self, pos):
+        pos_copy=pos.copy()
+        pos_copy[2] = 0.6
+        self.actuators.move_to_target(pos_copy)
+        return self.actuators.pickup_object(self.sensors)
 
-    def build_tower(self, target, cube_num, place_object):
-        if self.actuators.pickup_object(self.sensors) and place_object:
-            self.actuators.place_in_order(target, cube_num)
-
-    def identify_plates(self, plates):
-        initial_pos = self.sim.getObjectPose(self.actuators.simTip, self.actuators.simBase)
-        positions = dict()
-        for plate in plates:
-            pos = self.sim.getObjectPose(plate, self.actuators.simBase)
-            pos[2] = 0.3
-            self.actuators.move_to_pose(pos)
-            color = self.detectors.find_color()
-            positions[color] = pos
-        self.actuators.move_to_pose(initial_pos)
-        return positions
+    def place_cube(self, pos, tower_size):
+        self.actuators.place_object(pos, tower_size)

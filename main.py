@@ -2,10 +2,12 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from actuator import Actuator
 from sensors import Sensors
 from detector import Detector
-from processor import Processor
-from behaviours import *
+from behaviours_refactored import *
+from processor_refactored import Processor
+# from processor import Processor
+# from behaviours import *
+from parser import create_tree_from_json
 from time import sleep
-
 
 simulation_time = 60 * 60
 
@@ -27,47 +29,62 @@ if __name__ == '__main__':
     planes = [sim.getObject(f'./plate[{i}]') for i in range(3)]
     tower_plane = sim.getObject('./plate[3]')
 
-    # black_board = BlackBoard()
-    go_to_plane = MoveToPlane('GoToPlane', planes, processor)
+    # go_to_plane = MoveToPlane('GoToPlane', planes, processor)
+    # search_obj1 = SearchObject('SearchObj1', processor)
+    # search_obj2 = SearchObject('SearchObj2', processor)
+    # pick_and_place = PickAndPlace('PickAndPlace', processor)
+    # get_tower_order = GetTowerOrder('GetTowerOrder', processor)
+    # make_tower = StackCubes('MakeTower', processor, tower_plane)
+    #
+    # root = pt.composites.Sequence(name="Sequence", memory=True)
+    # root.add_child(go_to_plane)
+    # root.add_child(search_obj1)
+    # root.add_child(pick_and_place)
+    #
+    # root2 = pt.composites.Sequence(name="Sequence", memory=True)
+    # root2.add_child(get_tower_order)
+    # root2.add_child(search_obj2)
+    # root2.add_child(make_tower)
+    #
+    # search_green = SearchObject("searchobject_green", processor, colors="green", store_pos=True)
+    # search_red = SearchObject("searchobject_red", processor, colors="red")
+    # stack_red = StackCubes("pick_and_place_red", processor)
+    # root3 = pt.composites.Sequence(name="pick_red_place_on_green", memory=True)
+    # root3.add_children([search_green, search_red, stack_red])
+    #
+    # root4 = pt.composites.Sequence(name="pick_red_place_on_green", memory=True)
+    # search_red = SearchObject("searchobject_red", processor, colors="red")
+    # stack_red = StackCubes("pick_and_place_red", processor, place_object=False)
+    # root4.add_children([search_red, stack_red])
+
+    root_test = pt.composites.Sequence(name="json_test", memory=True)
+    #scenario1: sort cubes by color
+    go_to_plane = FindPlanes('FindPlanes', processor, planes)
     search_obj1 = SearchObject('SearchObj1', processor)
-    search_obj2 = SearchObject('SearchObj2', processor)
-    pick_and_place = PickAndPlace('PickAndPlace', processor)
-    get_tower_order = GetTowerOrder('GetTowerOrder', processor)
-    make_tower = MakeTower('MakeTower', processor, tower_plane)
+    pick_up = PickUpCube('PickUp',processor)
+    place_obj = PlaceCube('PlaceCube',processor)
 
-    root = pt.composites.Sequence(name="Sequence", memory=True)
-    root.add_child(go_to_plane)
-    root.add_child(search_obj1)
-    root.add_child(pick_and_place)
+    #scenario2: make a tower of X,Y,Z
+    search_obj2 = SearchObject('SearchObj1', processor, colors=["red","blue","green","blue"])
+    pick_up = PickUpCube('PickUp',processor, colors=["red","blue","green","blue"])
+    place_obj = PlaceCube('PlaceCube',processor)
 
-    root2 = pt.composites.Sequence(name="Sequence", memory=True)
-    root2.add_child(get_tower_order)
-    root2.add_child(search_obj2)
-    root2.add_child(make_tower)
 
-    # root2.setup_with_descendants()
 
-    choice = int(input("What do you want to do?\n 1. Sort by colour \n 2. Make a tower \n"))
-    while True:
-        if choice == 1:
-            root.tick_once()
-        elif choice == 2:
-            root2.tick_once()
-    # positions = processor.identify_plates(plates)
 
-    # while sim.getSimulationTime() < simulation_time:
-    #     color = list(positions.keys())
-    #     print(color)
-    #     cords = detector.blob_detect(color=color[0])
-    #     if len(cords) > 0:
-    #         print(f"{len(cords)} blob(s) detected!")
-    #         if actuator.move_to_target_pos(cords[0]):
-    #             actuator.pickup(cords[0], sensors, positions[color[0]])
-    #             actuator.move_to_target_pos(target_pos=None)
-    #     else:
-    #         actuator.move_to_target_pos(target_pos=None)
-    #         print("New random target pos")
-    #     client.step()
+    root_test.add_children([go_to_plane,search_obj1,pick_up,place_obj])
+    # root_test.add_children([search_obj2,pick_up,place_obj])
 
-    sim.stopSimulation()
-    sim.setInt32Param(sim.intparam_idle_fps, defaultIdleFps)
+    # with open('example_prompts/ex3_pickup.json', 'r') as json_file:
+    #     json_data = json_file.read()
+    #
+    #     children = create_tree_from_json(json_data, processor=processor, planes=planes, tower_plane=tower_plane)
+    #
+    # root_test.add_children(children)
+
+    try:
+        while True:
+            root_test.tick_once()
+    finally:
+        sim.stopSimulation()
+        sim.setInt32Param(sim.intparam_idle_fps, defaultIdleFps)

@@ -1,0 +1,19 @@
+{
+  "type": "sequence",
+  "name": "pickup_red",
+  "children": [
+    {
+      "behaviour": "SearchObject",
+      "name": "searchobject_red",
+      "colors": "red",
+      "store_pos": false
+
+    },
+    {
+      "behaviour": "StackCubes",
+      "name": "pickandplace_red",
+      "destination_plane": null,
+      "place_object": false
+    }
+  ]
+}

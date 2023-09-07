@@ -73,20 +73,30 @@ class Actuator:
         self.sim.moveToPose(-1, currentPose, self.max_vel, self.max_accel, self.max_jerk, targetPose,
                             self.ik_mov_callback, None, self.metric)
 
-    def place_object(self, destination):
-        destination[2] = 0.35
-        self.move_to_pose(destination)
-        destination[2] = 0.15
-        self.move_to_pose(destination)
+    def place_object(self, destination, tower_size):
+        dest = destination.copy()
+        dest[2] = 0.6
+        print("placing at ", dest)
+        self.move_to_pose(dest)
+        dest[2] = 0.075 * tower_size
+        self.move_to_pose(dest)
         self.sim.setInt32Signal('activated', 0)
+        print("deactivated the suction pad")
         self.attached = False
         self.in_position = False
-        destination[2] = 0.35
-        self.move_to_pose(destination)
-        # self.move_to_target_pos()
+        dest[2] = 0.6
+        dest[1] += 0.4
+        self.move_to_pose(dest)
+        dest[2] = 0.3
+        self.move_to_pose(dest)
 
-    def place_in_order(self, destination_plane, cube_num=1):
-        destination = self.sim.getObjectPose(destination_plane, self.simBase)
+    def place_in_order(self, target, cube_num=1):
+        if isinstance(target,list):
+            destination = self.search_start_pose
+            destination[0] = target[0]
+            destination[1] = target[1]
+        else:
+            destination = self.sim.getObjectPose(target, self.simBase)
         destination[2] = 0.6
         print("placing at ", destination)
         self.move_to_pose(destination)
@@ -117,10 +127,12 @@ class Actuator:
                     print("activated the suction pad")
                     self.sim.setInt32Signal('activated', 1)
                     self.attached = True
+                    initial_pos[2]=0.6
+                    self.move_to_pose(initial_pos)
                     return True
         return False
 
-    # def pickup(self, target, sensor):
+    # def pickup.txt(self, target, sensor):
     #     initial_pos = self.sim.getObjectPosition(self.simTip, self.sim.handle_world)
     #     initial_pos = np.array(initial_pos)
     #     target[2] = 0
@@ -168,12 +180,12 @@ class Actuator:
         if target_pos[0] < 1.3:
             target_pos[0] = 1.3
 
-        print("in position", initial_pos, target_pos)
+        # print("in position", initial_pos, target_pos)
 
         self.move_to_pose(target_pos)
         # truth_val = abs(initial_pos[3]) < 5.0e-10 and abs(initial_pos[4]) < 5.0e-10 and abs(initial_pos[5]) < 5.0e-10
         if abs(initial_pos[0]) - abs(target_pos[0]) < 0.0001 and abs(initial_pos[1]) - abs(target_pos[1]) < 0.0001:
-            print("in position", initial_pos, target_pos)
+            # print("in position", initial_pos, target_pos)
             return target_pos
         else:
             return None
