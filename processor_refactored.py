@@ -1,60 +1,84 @@
+import random
+from functools import partial
+
+
+def distance_squared( x, y):
+    return (x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2
 class Processor:
 
     def __init__(self, sim, actuators, sensors, detectors):
-        self.last_pos = None
         self.sim = sim
         self.actuators = actuators
         self.sensors = sensors
         self.detectors = detectors
-        self.increment = 0.3
-        self.started = False
-        self.search_start = sim.getObject('./search_start')
-        self.search_end = sim.getObject('./search_end')
-        self.search_start_pose = sim.getObjectPose(self.search_start, self.actuators.simBase)
-        self.search_end_pose = sim.getObjectPose(self.search_end, self.actuators.simBase)
 
-    def get_plane_cords(self, plate):
-        pos = self.sim.getObjectPose(plate, self.actuators.simBase)
-        pos[2] = 0.3
-        self.actuators.move_to_pose(pos)
+        self._increment = 0.3
+        self._last_position = None
+        self._started = False
+        self._blobs_dict = dict()
+        self._search_start_pose = sim.getObjectPose(sim.getObject('./search_start'), self.actuators.sim_base)
+        self._search_end_pose = sim.getObjectPose(sim.getObject('./search_end'), self.actuators.sim_base)
+
+    def get_plane_coordinates(self, plate):
+        pos = self.sim.getObjectPose(plate, self.actuators.sim_base)
+        temp = pos.copy()
+        temp[2] = 0.3
+        self.actuators.move_to_pose(temp)
         color = self.detectors.find_color()
-        # cords = self.sim.getObjectPosition(plate, self.sim.handle_world)
-        return color, pos
+        pos_rounded = [round(x, 4) for x in pos]
+        return color, pos_rounded
 
-    def search_for_object(self, colors):
-        if not self.started:
-            print("at start pos")
-            self.started = True
-            self.last_pos = self.search_start_pose.copy()
+    def search_for_object(self, colors, exclude_pos):
+        if not self._started:
+            print("Processor: at search start position")
+            self._started = True
+            self._last_position = self._search_start_pose.copy()
         else:
-            print("at last pos")
-            if self.last_pos[1] > self.search_end_pose[1]:
-                self.started = False
+            print("Processor: at last known position")
+            if self._last_position[1] > self._search_end_pose[1]:
+                self._started = False
                 return False, False
 
-        temp = self.actuators.move_to_target(self.last_pos)
+        temp = self.actuators.move_to_target(self._last_position)
 
-        cords = self.detectors.blob_detect(colors)  # cords with colours as the key
-        print("blobs:", cords.keys())
-        if cords:
-            color, pos = next(iter(cords.items()))
-            print("color, pos:", color, pos)
-            self.last_pos[0] = pos[0][0]
-            self.last_pos[1] = pos[0][1]
-            self.last_pos[2] = pos[0][2]
+        blobs = self.detectors.blob_detect(colors)  # cords with colours as the key
+        print("blobs: ", blobs)
 
-            if temp is not None or self.actuators.move_to_target(self.last_pos) is not None:
-                pos_rounded = [round(x,4) for x in self.last_pos]
+        if blobs:
+            print(f"Processor: exclude pos: {exclude_pos}")
+
+            color, pos = next(iter(blobs.items()))
+
+            if exclude_pos:
+                pos = max(list(blobs.values())[0], key=partial(distance_squared, exclude_pos[:3]))
+                pos = [pos]
+
+            self._last_position[0] = pos[0][0]
+            self._last_position[1] = pos[0][1]
+            self._last_position[2] = pos[0][2]
+
+            if temp is not None or self.actuators.move_to_target(self._last_position) is not None:
+                pos_rounded = [round(x,4) for x in self._last_position]
                 return color, pos_rounded
         else:
-            self.last_pos[1] += self.increment
+            self._last_position[1] += self._increment
         return False, False
 
     def pick_up(self, pos):
-        pos_copy=pos.copy()
+        pos_copy = pos.copy()
         pos_copy[2] = 0.6
         self.actuators.move_to_target(pos_copy)
         return self.actuators.pickup_object(self.sensors)
 
     def place_cube(self, pos, tower_size):
+        if isinstance(pos, int):
+            pos = self.sim.getObjectPose(pos, self.actuators.sim_base)
         self.actuators.place_object(pos, tower_size)
+    def move_arm(self, pos):
+        self.actuators.move_to_pose(pos)
+
+    def random_position_generator(self):
+        random_pos = self._search_start_pose.copy()
+        random_pos[0] = random.uniform(self._search_start_pose[0], self._search_end_pose[0])
+        random_pos[1] = random.uniform(self._search_start_pose[1], self._search_end_pose[1])
+        return random_pos

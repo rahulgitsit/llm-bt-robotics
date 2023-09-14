@@ -11,13 +11,13 @@ class Processor:
         self.detectors = detectors
         self.increment = 0.3
         self.started = False
-        self.search_start = sim.getObject('./search_start')
-        self.search_end = sim.getObject('./search_end')
-        self.search_start_pose = sim.getObjectPose(self.search_start, self.actuators.simBase)
-        self.search_end_pose = sim.getObjectPose(self.search_end, self.actuators.simBase)
+        self.search_start = sim.getObject('./_search_start')
+        self.search_end = sim.getObject('./_search_end')
+        self.search_start_pose = sim.getObjectPose(self.search_start, self.actuators.sim_base)
+        self.search_end_pose = sim.getObjectPose(self.search_end, self.actuators.sim_base)
 
     def get_plane_cords(self, plate):
-        pos = self.sim.getObjectPose(plate, self.actuators.simBase)
+        pos = self.sim.getObjectPose(plate, self.actuators.sim_base)
         pos[2] = 0.3
         self.actuators.move_to_pose(pos)
         color = self.detectors.find_color()
@@ -62,10 +62,10 @@ class Processor:
             self.actuators.place_in_order(target, cube_num)
 
     def identify_plates(self, plates):
-        initial_pos = self.sim.getObjectPose(self.actuators.simTip, self.actuators.simBase)
+        initial_pos = self.sim.getObjectPose(self.actuators.sim_tip, self.actuators.sim_base)
         positions = dict()
         for plate in plates:
-            pos = self.sim.getObjectPose(plate, self.actuators.simBase)
+            pos = self.sim.getObjectPose(plate, self.actuators.sim_base)
             pos[2] = 0.3
             self.actuators.move_to_pose(pos)
             color = self.detectors.find_color()

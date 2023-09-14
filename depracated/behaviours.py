@@ -15,7 +15,7 @@ class MoveToPlane(pt.behaviour.Behaviour):
 
     def update(self):
         if self.counter < len(self.planes):
-            color, cords = self.processor.get_plane_cords(self.planes[self.counter])
+            color, cords = self.processor.get_plane_coordinates(self.planes[self.counter])
             self.positions[color] = cords
             print(f"At the {self.counter + 1} plane.[{color}]")
             self.blackboard.in_sequence = False

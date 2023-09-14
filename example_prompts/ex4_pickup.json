@@ -1,18 +1,17 @@
 {
   "type": "sequence",
-  "name": "pickup_random",
+  "name": "pick_up",
   "children": [
     {
       "behaviour": "SearchObject",
-      "name": "searchobject_random",
-      "colors": "random"
+      "name": "search_object_B",
+      "colors": "blue",
+      "stack_loc": null
     },
     {
-      "behaviour": "StackCube",
-      "name": "pickandplace_random",
-      "destination_plane": null,
-      "place_object": false
-
+      "behaviour": "PickUpCube",
+      "name": "pick_up_cube_B",
+      "colors": "blue"
     }
-  ]
+    ]
 }

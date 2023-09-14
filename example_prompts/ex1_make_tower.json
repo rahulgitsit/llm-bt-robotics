@@ -1,23 +1,22 @@
 {
   "type": "sequence",
-  "name": "make_tower",
+  "name": "stack_cube",
   "children": [
     {
-      "behaviour": "GetTowerOrder",
-      "name": "get_tower_order",
-      "tower_color_order": "GBRR"
-    },
-    {
       "behaviour": "SearchObject",
-      "name": "searchobject_tower",
-      "colors": null,
-      "store_pos": false
+      "name": "search_object_RBGB",
+      "colors": ["red","blue","green","blue"],
+      "stack_loc": null
     },
     {
-      "behaviour": "StackCubes",
-      "name": "make_tower",
-      "destination_plane": "plane",
-      "place_object": true
+      "behaviour": "PickUpCube",
+      "name": "pick_up_cube_RBGB",
+      "colors": ["red","blue","green","blue"]
+    },
+    {
+      "behaviour": "PlaceCube",
+      "name": "place_cube_RBGB",
+      "target_loc": null
     }
   ]
 }

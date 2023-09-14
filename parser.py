@@ -1,42 +1,39 @@
-from behaviours import *
+from behaviours_refactored import *
 import json
 
 
 def create_tree_from_json(json_data, processor, planes, tower_plane):
     children = []
-
-    data = json.loads(json_data)
+    print("Parsing the json command...")
+    try:
+        data = json.loads(json_data)
+    except ValueError:
+        print("Invalid command. Command expected in JSON")
+        return None
 
     for item in data.get("children", []):
         node_type = item.get("behaviour")
         node_name = item.get("name")
         node_params = {}
 
-        if "tower_color_order" in item:
-            node_params["tower_color_order"] = item["tower_color_order"]
         if "colors" in item:
             node_params["colors"] = item["colors"]
-        if "store_pos" in item:
-            node_params["store_pos"] = item["store_pos"]
-        if "destination_plane" in item:
-            node_params["destination_plane"] = item["destination_plane"]
-            if node_params["destination_plane"] is not None:
-                node_params["destination_plane"] = tower_plane
-
-        if "place_object" in item:
-            node_params["place_object"] = item["place_object"]
+        if "stack_loc" in item:
+            node_params["stack_loc"] = item["stack_loc"]
+        if "target_loc" in item:
+            node_params["target_loc"] = item["target_loc"]
+            if node_params["target_loc"] == "tower_plane":
+                node_params["target_loc"] = tower_plane
 
         if node_type:
-            if node_type == "MoveToPlane":
-                children.append(MoveToPlane(node_name, processor, planes))
+            if node_type == "FindPlanes":
+                children.append(FindPlanes(node_name, processor, planes, colors=node_params['colors']))
             elif node_type == "SearchObject":
-                children.append(SearchObject(node_name, processor, colors=node_params["colors"], store_pos=node_params["store_pos"]))
-            elif node_type == "PickAndPlace":
-                children.append(PickAndPlace(node_name, processor))
-            elif node_type == "GetTowerOrder":
-                children.append(GetTowerOrder(node_name, processor,tower_color_order=node_params["tower_color_order"]))
-            elif node_type == "StackCubes":
-                children.append(StackCubes(node_name, processor, destination_plane=node_params["destination_plane"], place_object=node_params["place_object"]))
+                children.append(SearchObject(node_name, processor, colors=node_params["colors"], stack_loc=node_params["stack_loc"]))
+            elif node_type == "PickUpCube":
+                children.append(PickUpCube(node_name, processor, colors=node_params["colors"]))
+            elif node_type == "PlaceCube":
+                children.append(PlaceCube(node_name, processor, target_loc=node_params["target_loc"]))
             else:
                 raise ValueError(f"Unknown node type: {node_type}")
 

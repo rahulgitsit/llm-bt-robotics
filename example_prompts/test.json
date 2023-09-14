@@ -9,18 +9,18 @@
     },
     {
       "behaviour": "SearchObject",
-      "name": "search_object_sort",
+      "name": "search_object",
       "colors": null,
       "stack_loc": null
     },
     {
       "behaviour": "PickUpCube",
-      "name": "pick_up_cube_sort",
+      "name": "pick_up_cube",
       "colors": null
     },
     {
       "behaviour": "PlaceCube",
-      "name": "place_cube_sort",
+      "name": "place_cube",
       "target_loc": null
     }
   ]
