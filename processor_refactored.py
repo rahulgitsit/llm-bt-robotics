@@ -30,11 +30,11 @@ class Processor:
 
     def search_for_object(self, colors, exclude_pos):
         if not self._started:
-            print("Processor: at search start position")
+            print("Serching at search start position")
             self._started = True
             self._last_position = self._search_start_pose.copy()
         else:
-            print("Processor: at last known position")
+            print("Searching at last known position")
             if self._last_position[1] > self._search_end_pose[1]:
                 self._started = False
                 return False, False
@@ -42,7 +42,7 @@ class Processor:
         temp = self.actuators.move_to_target(self._last_position)
 
         blobs = self.detectors.blob_detect(colors)  # cords with colours as the key
-        print("blobs: ", blobs)
+        print("Blobs Detected: ", blobs)
 
         if blobs:
             print(f"Processor: exclude pos: {exclude_pos}")

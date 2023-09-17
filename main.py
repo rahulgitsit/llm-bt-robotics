@@ -47,7 +47,6 @@ if __name__ == '__main__':
                 response_content = message['data'].decode('utf-8')
                 children = create_tree_from_json(response_content, processor=processor, planes=planes,
                                                  tower_plane=tower_plane)
-                print(f"Command Received: {children}")
 
                 try:
                     root_test.add_children(children)
@@ -62,7 +61,6 @@ if __name__ == '__main__':
                     state.update_state(children)
                 root_test.status = None
                 root_test.remove_all_children()
-            print(root_test.status)
             print("Waiting for next command!")
 
     finally:

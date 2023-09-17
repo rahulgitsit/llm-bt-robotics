@@ -9,6 +9,7 @@ class FindPlanes(pt.behaviour.Behaviour):
         name (str): The name of the behavior.
         processor (Processor): An instance of the processor class.
         planes (list): A list of planes where the cubes need to be stacked.
+        colors (str): The color of the plane where the cube needs to be stacked.
 
     Attributes:
         processor (Processor): The processor class instance.
@@ -21,6 +22,7 @@ class FindPlanes(pt.behaviour.Behaviour):
 
     def __init__(self, name, processor, planes, colors=None):
         super(FindPlanes, self).__init__(name)
+        self._plane_found = False
         self.processor = processor
         self.planes = planes
         self.blackboard = self.attach_blackboard_client(name="FindPlanesClient")
@@ -37,14 +39,17 @@ class FindPlanes(pt.behaviour.Behaviour):
         Returns:
             pt.common.Status: The current status of the behavior.
         """
+        if self._plane_found:
+            return pt.common.Status.SUCCESS
 
-        if self.counter < len(self.planes):
+        elif self.counter < len(self.planes):
             color, cords = self.processor.get_plane_coordinates(self.planes[self.counter])
             self.positions[color] = cords
             print(f"At the {self.counter + 1} plane.[{color}]")
             self.blackboard.in_sequence = False
             self.counter += 1
             if self.plane_color and self.plane_color == color:
+                self._plane_found = True
                 self.blackboard.plane_pos = self.positions
                 return pt.common.Status.SUCCESS
 
@@ -56,6 +61,33 @@ class FindPlanes(pt.behaviour.Behaviour):
 
 
 class SearchObject(pt.behaviour.Behaviour):
+    """
+       A behavior class for searching and processing blobs based on their colors.
+
+       Args:
+           name (str): The name of the behavior.
+           processor: An instance of the processor class.
+           colors (list or str, optional): A list of colors to search for or a single color string.
+               If provided, the behavior will search for objects of specific colors in the specified order.
+               Defaults to None.
+           stack_loc: The location to stack the objects once found. Defaults to None.
+
+       Attributes:
+           blackboard: An instance of a blackboard client for communication with the behavior tree.
+           colors: The list of colors to search for or a single color string.
+           stack_loc: The location to stack the objects.
+           _color_counter (int): Internal counter to count the no. of colors searched from list of colors provided.
+           _pos_adjust (int): Internal adjustment value for object positions.
+           _color_pos_dict (dict): A dictionary to keep track of all detected cubes and their positions.
+           _search_space_stack_loc: The location to search for stacking objects.
+           _exclude_pos: Positions to exclude during the search.
+           _search_counter (int): Internal counter for the number of search attempts.
+
+       Methods:
+           update(self):
+               Executes the behavior logic for searching and processing objects.
+               Returns a behavior tree status code (pt.common.Status).
+    """
     def __init__(self, name, processor, colors=None, stack_loc=None):
         super(SearchObject, self).__init__(name)
         self.processor = processor
@@ -79,6 +111,12 @@ class SearchObject(pt.behaviour.Behaviour):
         self._search_counter = 0
 
     def update(self):
+        """
+               Executes the behavior logic for searching and processing objects.
+
+               Returns:
+                   pt.common.Status: The behavior tree status code indicating SUCCESS, FAILURE, or RUNNING.
+       """
         if self.colors is not None:
             if isinstance(self.colors, list) and len(self.colors) > 1:  # stack order is given
                 self.blackboard.in_sequence = True
@@ -100,7 +138,7 @@ class SearchObject(pt.behaviour.Behaviour):
         color, position = self.processor.search_for_object(search_colors, self._exclude_pos)  # current color and position
         self._search_counter += 1
 
-        print(f"SearchObject: Detected colour: {color} @ position: {position}")
+        print(f"Detected colour: {color} @ position: {position}")
 
         if self._search_counter > 15:
             return pt.common.Status.FAILURE
@@ -111,20 +149,30 @@ class SearchObject(pt.behaviour.Behaviour):
         return pt.common.Status.RUNNING
 
     def search_until_alignment(self, color, position):
+        """
+           Continuously searches for objects until the arm's position is aligned with the detected object's position.
+
+           Args:
+               color (str): The color of the detected object.
+               position (tuple): The position of the detected object.
+
+           Returns:
+               pt.common.Status: The behavior tree status code indicating SUCCESS, FAILURE, or RUNNING.
+           """
         self._pos_adjust += 1
         self._search_counter = 0
 
         if self._pos_adjust == 3:
             self._pos_adjust = 0
-            print("SearchObject: Arm position aligned.")
-            self.blackboard.current_color_pos = color, position  # storing incase the command is to just sort
+            print("Arm position aligned.")
+            self.blackboard.current_color_pos = color, position
             self._color_pos_dict[color].add(
                 tuple(position))  # store the position of all the colors and objects detected
             self.blackboard.color_pos_dict = self._color_pos_dict
-            print("color and position dictionary: ", self.blackboard.color_pos_dict.items())
+            print("Color and position dictionary: ", self.blackboard.color_pos_dict.items())
             self._color_counter += 1
 
-            if self._color_counter == 1 and self.stack_loc is None and len(self.blackboard.color_order) > 1:  # if stack on the search space
+            if self._color_counter == 1 and "cube" in self.stack_loc and len(self.blackboard.color_order) > 1:  # if stack on the search space
                 self._exclude_pos = position.copy()
                 return pt.common.Status.RUNNING
             return pt.common.Status.SUCCESS
@@ -132,13 +180,37 @@ class SearchObject(pt.behaviour.Behaviour):
 
 
 class PickUpCube(pt.behaviour.Behaviour):
-    def __init__(self, name, processor, colors=None):  # TODO do we need this pick_up location here?
+    """
+       A behavior class for picking up cubes based on their color.
+
+       Args:
+           name (str): The name of the behavior.
+           processor: An instance of the processor class.
+           colors (list or str, optional): A list of colors to pick up or a single color string.
+               Defaults to None.
+
+       Attributes:
+           colors: The list of colors to pick up or a single color string.
+           blackboard: An instance of a blackboard client for communication with the behavior tree.
+               It registers keys for accessing information from other behaviors.
+           blackboard.picked_up (bool): A flag indicating whether a cube has been successfully picked up.
+           blackboard.pickup_history (list): A list to keep track of the colors of cubes picked up.
+
+       Methods:
+           update(self):
+               Executes the behavior logic for picking up cubes.
+               Returns a behavior tree status code (pt.common.Status).
+
+           try_pickup(self, pos, color):
+               Attempts to pick up a cube at the specified position.
+"""
+    def __init__(self, name, processor, colors=None):
         super(PickUpCube, self).__init__(name)
         self.processor = processor
         self.colors = colors
         self.blackboard = self.attach_blackboard_client(name="PickUpClient")
         self.blackboard.register_key(key="color_order",
-                                     access=pt.common.Access.READ)  # TODO from get tower order//MAYBE REWORK REQUIRED
+                                     access=pt.common.Access.READ)
         self.blackboard.register_key(key="in_sequence",
                                      access=pt.common.Access.READ)
         self.blackboard.register_key(key="current_color_pos", access=pt.common.Access.READ)
@@ -154,14 +226,30 @@ class PickUpCube(pt.behaviour.Behaviour):
             self.blackboard.picked_up = False
 
     def update(self):
+        """
+                Executes the behavior logic for picking up cubes.
+
+                Returns:
+                    pt.common.Status: The behavior tree status code indicating SUCCESS, FAILURE, or RUNNING.
+        """
         if not self.blackboard.picked_up:
             color, pos = self.blackboard.current_color_pos
             return self.try_pickup(pos, color)
         else:
-            print("Pickup not possible")
+            print("Pickup not possible. Suction pad busy!")
             return pt.common.Status.FAILURE
 
     def try_pickup(self, pos, color):
+        """
+                Attempts to pick up a cube at the specified position.
+
+                Args:
+                    pos (tuple): The position of the cube to pick up.
+                    color (str): The color of the cube to pick up.
+
+                Returns:
+                    pt.common.Status: The behavior tree status code indicating SUCCESS, FAILURE, or RUNNING.
+        """
         if self.processor.pick_up(pos):
             print(f"Picking up {color} cube at {pos}")
             try:
@@ -169,12 +257,38 @@ class PickUpCube(pt.behaviour.Behaviour):
             except:
                 self.blackboard.pickup_history = [color]
             self.blackboard.picked_up = True
+
+            print(f"Pickup history --> [{self.blackboard.pickup_history}]")
             return pt.common.Status.SUCCESS
         else:
             return pt.common.Status.RUNNING
 
 
 class PlaceCube(pt.behaviour.Behaviour):
+    """
+       A behavior class for placing cubes at specified locations.
+
+       Args:
+           name (str): The name of the behavior.
+           processor: An object that performs the cube placement.
+           target_loc: The target location for placing the cube.
+               It can be a specific position, "random" for random placement,
+               or one of ["red_plane", "blue_plane", "green_plane"] for placing on color-specific planes.
+               Defaults to None.
+
+       Attributes:
+           processor: An object responsible for cube placement.
+           target_loc: The target location for placing the cube.
+           blackboard: An instance of a blackboard client for communication with the behavior tree.
+               It registers keys for accessing information from other behaviors.
+
+       Methods:
+           update(self):
+               Executes the behavior logic for placing cubes.
+               Returns a behavior tree status code (pt.common.Status).
+       """
+
+
     def __init__(self, name, processor, target_loc=None):  # target_loc can be any pos, keep it generic
         super(PlaceCube, self).__init__(name)
         self.processor = processor
@@ -188,7 +302,7 @@ class PlaceCube(pt.behaviour.Behaviour):
         self.blackboard.register_key(key="picked_up", access=pt.common.Access.WRITE)
         self.blackboard.register_key(key="color_pos_dict",
                                      access=pt.common.Access.WRITE)  # To keep track of all the cubes and its positions
-        self.blackboard.register_key(key="pickup_history", access=pt.common.Access.WRITE)  # TODO NOT BEING USED
+        self.blackboard.register_key(key="pickup_history", access=pt.common.Access.WRITE)  #
         # to keep track of the objects the arm has picked up in the past
 
     def update(self):
@@ -207,7 +321,7 @@ class PlaceCube(pt.behaviour.Behaviour):
                 self.processor.place_cube(plane_pos, picked_items.count(color))
                 return pt.common.Status.FAILURE
 
-            print(f"target plane {color} pos ", plane_pos[color])
+            print(f"target plane: {color} pos {plane_pos[color]}")
             self.blackboard.color_pos_dict[color].remove(tuple(pos))
             self.blackboard.color_pos_dict[color].add(
                 tuple(
@@ -236,6 +350,9 @@ class PlaceCube(pt.behaviour.Behaviour):
                 self.processor.place_cube(plane_pos, len(picked_items))
                 return pt.common.Status.SUCCESS
 
-        else:
+        try:
             self.processor.place_cube(self.target_loc, len(picked_items))
             return pt.common.Status.SUCCESS
+        except ValueError:
+            print("Invalid inputs! Placing the object failed")
+            return pt.common.Status.FAILURE
