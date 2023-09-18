@@ -8,7 +8,7 @@
       "name": "movetoplane_sort",
     },
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_sort",
       "colors": null,
       “store_pos”: false,
@@ -31,7 +31,7 @@
       "name": "movetoplane_sort",
     },
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_sort",
       "colors": "”,
       “store_pos”: false,

@@ -10,7 +10,7 @@
       "tower_color_order": "RBBG"
     },
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_tower",
       "colors": null,
       "store_pos": false
@@ -36,7 +36,7 @@
       "tower_color_order": "GBRR"
     },
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_tower",
       "colors": null,
       "store_pos": false

@@ -5,7 +5,7 @@
   "name": "pickup_red",
   "children": [
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_red",
       "colors": "red"
     },
@@ -26,7 +26,7 @@
   "name": "pickup_random",
   "children": [
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_random",
       "colors": "random"
     },

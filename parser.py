@@ -1,10 +1,11 @@
-from behaviours_refactored import *
+from behaviours import *
 import json
 
 
 def create_tree_from_json(json_data, processor, planes, tower_plane):
     children = []
     print("Parsing the json command...")
+    print(json_data)
     try:
         data = json.loads(json_data)
     except ValueError:
@@ -13,11 +14,13 @@ def create_tree_from_json(json_data, processor, planes, tower_plane):
 
     for item in data.get("children", []):
         node_type = item.get("behaviour")
-        node_name = item.get("name")
+        # node_name = item.get("name")
         node_params = {}
 
         if "colors" in item:
             node_params["colors"] = item["colors"]
+        if "stack_color_order" in item:
+            node_params["stack_color_order"] = item["stack_color_order"]
         if "stack_loc" in item:
             node_params["stack_loc"] = item["stack_loc"]
         if "target_loc" in item:
@@ -27,13 +30,13 @@ def create_tree_from_json(json_data, processor, planes, tower_plane):
 
         if node_type:
             if node_type == "FindPlanes":
-                children.append(FindPlanes(node_name, processor, planes, colors=node_params['colors']))
-            elif node_type == "SearchObject":
-                children.append(SearchObject(node_name, processor, colors=node_params["colors"], stack_loc=node_params["stack_loc"]))
+                children.append(FindPlanes("find_planes", processor, planes, colors=node_params['colors']))
+            elif node_type == "SearchCubeOrder":
+                children.append(SearchCubeOrder("search_cube", processor, stack_color_order=node_params["stack_color_order"], stack_loc=node_params["stack_loc"]))
             elif node_type == "PickUpCube":
-                children.append(PickUpCube(node_name, processor, colors=node_params["colors"]))
+                children.append(PickUpCube("pick_up_cube", processor))
             elif node_type == "PlaceCube":
-                children.append(PlaceCube(node_name, processor, target_loc=node_params["target_loc"]))
+                children.append(PlaceCube("place_cube", processor, target_loc=node_params["target_loc"]))
             else:
                 raise ValueError(f"Unknown node type: {node_type}")
 

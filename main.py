@@ -3,8 +3,8 @@ from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from actuator import Actuator
 from sensors import Sensors
 from detector import Detector
-from behaviours_refactored import *
-from processor_refactored import Processor
+from behaviours import *
+from processor import Processor
 from parser import create_tree_from_json
 import redis
 import json

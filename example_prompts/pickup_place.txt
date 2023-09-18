@@ -5,13 +5,13 @@
   "name": "pick_red_placeon_green",
   "children": [
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_green",
       "colors": "green",
       "store_pos": true
     },
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_red",
       "colors": "red"
     },
@@ -31,13 +31,13 @@
   "name": "pick_green_placeon_blue",
   "children": [
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_blue",
       "colors": "blue",
       "store_pos": true
     },
     {
-      "behaviour": "SearchObject",
+      "behaviour": "SearchCubeOrder",
       "name": "searchobject_green",
       "colors": "green"
       "store_pos": false
