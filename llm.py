@@ -1,7 +1,7 @@
 import openai
 import redis
 
-openai.api_key = "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"
+openai.api_key = "OPEN_AI_KEY"
 
 # Initialize a Redis client
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
