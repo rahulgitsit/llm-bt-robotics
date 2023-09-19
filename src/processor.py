@@ -65,7 +65,7 @@ class Processor:
         temp = self.actuators.move_to_target(self._last_position)
 
         blobs = self.detectors.blob_detect(colors)  # cords with colours as the key
-        print("Blobs Detected: ", blobs)
+        # print("Blobs Detected: ", blobs)
 
         if blobs:
             print(f"Processor: exclude pos: {exclude_pos}")

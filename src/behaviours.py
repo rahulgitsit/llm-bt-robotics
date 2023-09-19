@@ -130,7 +130,7 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
 
                 search_colors = [self.colors[self._color_counter]]  # get the first colour
             else:  # single colour is given to pick
-                print(f"Single colour search {self.colors}")
+                # print(f"Single colour search {self.colors}")
                 self.blackboard.in_sequence = False
                 search_colors = self.colors
                 self.blackboard.color_order = search_colors
@@ -175,7 +175,7 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
         """
         self._pos_adjust += 1
         self._search_counter = 0
-
+        print(f"Adjusting position...({self._pos_adjust})")
         if self._pos_adjust == 3:
             self._pos_adjust = 0
             print("Arm position aligned.")
@@ -183,7 +183,7 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
             self._color_pos_dict[color].add(
                 tuple(position))  # store the position of all the colors and objects detected
             self.blackboard.color_pos_dict = self._color_pos_dict
-            print("Color and position dictionary: ", self.blackboard.color_pos_dict.items())
+            # print("Color and position dictionary: ", self.blackboard.color_pos_dict.items())
             self._color_counter += 1
 
             if self._color_counter == 1 and self.stack_loc is not None and "cube" in self.stack_loc:
