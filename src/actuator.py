@@ -3,6 +3,39 @@ import random
 
 
 class Actuator:
+    """
+        The actuator controller for the robotic arm with inverse kinematics (IK) capabilities.
+
+        Attributes:
+            vel_f (float): The velocity factor for IK calculations.
+            accel (float): The acceleration value for IK calculations.
+            jerk (float): The jerk value for IK calculations.
+            max_vel (list): A list of maximum joint velocities for the robotic arm.
+            max_accel (list): A list of maximum joint accelerations for the robotic arm.
+            max_jerk (list): A list of maximum joint jerks for the robotic arm.
+            metric (list): A list of metrics used in IK calculations.
+            in_position (bool): A flag indicating whether the tip of the arm is in the desired position.
+
+        Methods:
+            __init__(self, sim, sim_ik):
+                Initializes an instance of the Actuator class.
+
+            ik_mov_callback(self, pose, vel, accel, handles):
+                Callback function for IK-based movement.
+
+            move_to_pose(self, target_pose):
+                Moves the robotic arm to a specified target pose using inverse kinematics.
+
+            place_object(self, destination, tower_size):
+                Places an object at a specified destination and tower size.
+
+            pickup_object(self, sensor):
+                Picks up an object using a proximity sensor and activates the suction pad.
+
+            move_to_target(self, target_pos=None):
+                Moves the robotic arm to a specified target position or a random position within a defined range.
+        """
+
     # for IK
     vel_f = 1
     accel = 20 * math.pi / 180
@@ -12,12 +45,18 @@ class Actuator:
     max_accel = [accel] * 3
     max_jerk = [jerk] * 3
     metric = [1, 1, 1, 0.1]
-    in_position = False
-    prev_intermediate_pos = [999, 999, 999]
 
+    in_position = False
     attached = False
 
     def __init__(self, sim, sim_ik):
+        """
+            Initializes an instance of the Actuator class.
+
+            Args:
+                sim: The simulation environment.
+                sim_ik: The inverse kinematics solver for the robotic arm.
+        """
         self.sim = sim
         self.sim_ik = sim_ik
 
@@ -45,21 +84,48 @@ class Actuator:
         self.sim.setInt32Signal("activated", 0)
 
     def ik_mov_callback(self, pose, vel, accel, handles):
+        """
+           Callback function for IK-based movement.
+
+           Args:
+               pose: The target pose for the robotic arm.
+           Returns:
+               None
+       """
         self.sim.setObjectPose(self.sim_target, self.sim_base, pose)
         self.sim_ik.handleGroup(self.ik_env, self.ik_group_undamped, {"syncWorlds": True, "allowError": True})
 
     def move_to_pose(self, target_pose):
+        """
+           Moves the robotic arm to a specified target pose using inverse kinematics.
+
+           Args:
+               target_pose: The target pose to reach.
+
+           Returns:
+               None
+       """
         current_pose = self.sim.getObjectPose(self.sim_tip, self.sim_base)
         self.sim.setObjectPose(self.sim_target, self.sim_base, current_pose)
         self.sim.moveToPose(-1, current_pose, self.max_vel, self.max_accel, self.max_jerk, target_pose,
                             self.ik_mov_callback, None, self.metric)
 
     def place_object(self, destination, tower_size):
+        """
+           Places an object at a specified destination with a specified tower size.
+
+           Args:
+               destination: The destination pose for placing the object.
+               tower_size: The size of the tower.
+
+           Returns:
+               None
+       """
         dest = destination.copy()
         dest[2] = 0.6
         print(f"Actuator: placing at {dest}")
         self.move_to_pose(dest)
-        dest[2] = 0.075 * tower_size
+        dest[2] = 0.083 * tower_size
         self.move_to_pose(dest)
         self.sim.setInt32Signal('activated', 0)
         print("Actuator: deactivated the suction pad")
@@ -72,6 +138,15 @@ class Actuator:
         self.move_to_pose(dest)
 
     def pickup_object(self, sensor):
+        """
+            Picks up an object using a proximity sensor and activates the suction pad.
+
+            Args:
+                sensor: sensor class object.
+
+            Returns:
+                bool: True if the object is successfully picked up, False otherwise.
+        """
         initial_pos = self.sim.getObjectPose(self.sim_tip, self.sim_base)
         counter = 0
         if not self.attached:
@@ -90,6 +165,15 @@ class Actuator:
         return False
 
     def move_to_target(self, target_pos=None):
+        """
+            Moves the robotic arm to a specified target position or a random position within a defined range.
+
+            Args:
+                target_pos: The target position to move to (optional).
+
+            Returns:
+                list or None: The target position if successfully reached, None otherwise.
+        """
 
         initial_pos = self.sim.getObjectPose(self.sim_tip, self.sim_base)
 

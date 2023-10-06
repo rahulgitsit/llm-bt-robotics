@@ -1,6 +1,30 @@
 
 class SaveState:
+    """
+        The `SaveState` class is used to save and restore the state of the robot's environment after each command.
+
+        Attributes:
+            state (dict): A dictionary to store the state information.
+
+        Methods:
+            __init__(self):
+                Initialises an instance of the SaveState class.
+
+            update_state(self, children):
+                Updates the state based on the blackboard values.
+
+            restore_state(self, new_children):
+                Restores the state
+
+            print_state(self):
+                Prints the current state information.
+
+    """
+
     def __init__(self):
+        """
+           Initialises an instance of the SaveState class.
+       """
         self.state = dict(plane_pos="", in_sequence="", color_order=[], current_color_pos="", color_pos_dict="",
                           picked_up="",) # pickup_history=""
         # self.children = children

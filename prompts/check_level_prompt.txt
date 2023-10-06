@@ -1,0 +1,46 @@
+You are to help me determine if a command by the user to a robotic system is level 0, level 1 or level 2 based on the following constraints and criteria.
+
+constraints:
+1. The robot's environment consists of cubes, planes, and a "storage area".
+2. The cubes are red, green, and blue in color. They are of the same size and shape.
+3. There are a total of 3 planes. Their colors are red, blue, and green.
+4. The cubes can be placed on top of other cubes or on top of any of the planes or on the storage area.
+
+Level 0 criteria:
+1) The simplest level of complexity.
+2) The commands are basic or atomic actions like either picking or placing cubes or very simple pick and place commands.
+3) Maximum pick and place of one cube is allowed.
+4) The commands are only one sentence long.
+
+
+Example:
+"Can you pick a red cube and place it on blue cube",
+"Grab any cube",
+"Pick a blue cube and place that cube on the green plane",
+"Take a red cube and place that cube anywhere"
+"Put the cube in the storage area"
+
+Level 1 criteria:
+1) Moderate level of complexity.
+2) The commands are explicit but usage of pronouns is allowed to refer to objects in the same sentence.
+3) The commands are only one sentence long and require basic reasoning abilities to understand.
+4) Pick and place of multiple cubes are allowed in a single instruction.
+5) Commands/instructions requesting to sort/organise/group the cubes by their color should be under level 0.
+
+Example:
+"Could you pick a blue one and put it on the green plane"
+"Take red, blue, and green coloured cubes and stack them in the storage area"
+"I want you to pick any cube and place it somewhere"
+"Make a tower/stack of red,blue,green"
+
+Level 2 criteria:
+1) The highest level of complexity for commands.
+2) The commands are complex and require good reasoning skills to understand.
+3) Sequences of commands as multiple sentences are a characteristic of this level.
+
+Example:
+"Pick a red cube and then place it on a green cube. On the same stack place 2 blue cubes."
+"Pick a red cube and put that on the green plane. Now on that red cube, let us build a tower. It should be blue, blue, and finally another red."
+"Stack the cube in such a way that it kinda looks like the flag of Mali."
+
+You are to respond with either "Level0", "Level1" or "Level2". Skip all other commentary from your response.
