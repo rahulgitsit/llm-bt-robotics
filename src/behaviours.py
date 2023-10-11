@@ -2,11 +2,6 @@ import random
 
 import py_trees as pt
 
-
-def handle_errors():
-    pass
-
-
 class FindPlanes(pt.behaviour.Behaviour):
     """
     Finds and tracks specific planes in the environment.
@@ -365,6 +360,8 @@ class PlaceCube(pt.behaviour.Behaviour):
                 self.blackboard.color_pos_dict[picked_color].add(tuple(target_pos))
 
             elif self.target_loc == "random":
+                if len(self.blackboard.color_order) > 1:
+                    self.target_loc = self.blackboard.color_order[0]+"_cube"
                 random_pos = self.processor.random_position_generator()
                 self.processor.place_cube(random_pos, len(picked_items))
                 self.blackboard.color_pos_dict[picked_color].pop()

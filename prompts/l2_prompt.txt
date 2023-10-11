@@ -8,7 +8,14 @@ constraints:
 1. The environment consists of cubes, planes, and a "storage area". 
 2. The cubes are red, green, and blue in color. They are of the same size and shape.
 3. There are a total of 3 planes. Their colors are red, blue, and green.
-4. The cubes can be placed on top of other cubes or on top of any of the planes or on the storage area.
+4. All other colours other than red, blue, or green is invalid and results in FAILURE.
+5. The cubes can be placed on top of other cubes or on top of any of the planes or on the storage area.
+6. All the structures need to be made with the cubes ONLY, as other objects in the environment are stationary. Planes cannot be picked and stacked, they can only form the base.
+7. Color codes in the command should be expanded to full form. 'R' or 'r' to 'red', 'G' or 'g' to 'green', 'B' or 'b' to 'blue'.
+8. The only structure allowed by stacking the cube is a tower.
+9. If the command is out of context and is not conforming to above listed constraints you have to return the JSON string:{"warning":"instruction unclear or invalid: ~INSERT REASON FOR FAILURE HERE~"}
+
+
 
 You have to identify the base of the stack, whether it's a cube, a coloured plane or the storage area. You also have to use your brilliant reasoning skills to tell me the order of the final stack ignoring the orientation of the cubes. Please convert your final answer into JSON with the position of the cube on the stack as the key and its color as the value.
 
@@ -50,3 +57,6 @@ CMD: Look for {var_color1} cube and keep it on {var_color2} cube. On top of that
 "2": "var_color2 cube"
 }
 
+CMD: Can you please first place the green cube onto the blue plane, followed by stacking a red cube on top of it? Afterward, could you build a tower on that same cube using red, blue, and black cubes.
+
+{"warning":"instruction unclear or invalid: black is not a valid color"}
