@@ -2,11 +2,6 @@ import random
 
 import py_trees as pt
 
-
-def handle_errors():
-    pass
-
-
 class FindPlanes(pt.behaviour.Behaviour):
     """
     Finds and tracks specific planes in the environment.
@@ -25,13 +20,18 @@ class FindPlanes(pt.behaviour.Behaviour):
 
     def __init__(self, name, processor, planes, colors=None):
         super(FindPlanes, self).__init__(name)
-        self._plane_found = False
+        # self._plane_found = False
         self.processor = processor
         self.planes = planes
         self.blackboard = self.attach_blackboard_client(name="FindPlanesClient")
         self.blackboard.register_key(key="plane_pos", access=pt.common.Access.WRITE)
         self.blackboard.register_key(key="in_sequence", access=pt.common.Access.WRITE)
-        self.counter = 0
+
+        try:
+            self.counter = len(self.blackboard.plane_pos)
+        except KeyError:
+            self.counter = 0
+
         self.positions = dict()
         self.plane_color = colors
 
@@ -44,23 +44,29 @@ class FindPlanes(pt.behaviour.Behaviour):
         :returns:
             SUCCESS: Target plane found.
         """
-        if self._plane_found:
-            return pt.common.Status.SUCCESS
 
-        elif self.counter < len(self.planes):
+
+        if self.counter > 0 and self.plane_color:
+            if self.plane_color in list(self.blackboard.plane_pos.keys()):
+                return pt.common.Status.SUCCESS
+
+        # if self._plane_found:
+        #     return pt.common.Status.SUCCESS
+
+        if self.counter < len(self.planes):
             color, cords = self.processor.get_plane_coordinates(self.planes[self.counter])
             self.positions[color] = cords
+            self.blackboard.plane_pos = self.positions
             print(f"At the {self.counter + 1} plane.[{color}]")
             self.blackboard.in_sequence = False
             self.counter += 1
             if self.plane_color and self.plane_color == color:
-                self._plane_found = True
-                self.blackboard.plane_pos = self.positions
+                # self._plane_found = True
+                # self.blackboard.plane_pos = self.positions
                 return pt.common.Status.SUCCESS
 
             return pt.common.Status.RUNNING
         else:
-            self.blackboard.plane_pos = self.positions
             print("All planes covered")
             return pt.common.Status.SUCCESS
 
@@ -108,6 +114,7 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
         self._search_space_stack_loc = None
         self._exclude_pos = None
         self._search_counter = 0
+        # self._single_color_object_placed=False
 
     def update(self):
         """
@@ -130,7 +137,6 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
 
                 search_colors = [self.colors[self._color_counter]]  # get the first colour
             else:  # single colour is given to pick
-                # print(f"Single colour search {self.colors}")
                 self.blackboard.in_sequence = False
                 search_colors = self.colors
                 self.blackboard.color_order = search_colors
@@ -139,8 +145,10 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
             search_colors = list(self.blackboard.plane_pos.keys())
             self.blackboard.in_sequence = False
 
-        elif self.colors == "random":
+        elif self.colors == "random" or None:
             search_colors = random.sample(["red", "blue", "green"])
+            self.blackboard.color_order = [search_colors]
+
 
         else:
             raise ValueError("Invalid color!")
@@ -186,8 +194,8 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
             # print("Color and position dictionary: ", self.blackboard.color_pos_dict.items())
             self._color_counter += 1
 
-            if self._color_counter == 1 and self.stack_loc is not None and "cube" in self.stack_loc:
-                self._exclude_pos = position.copy()  # if stack on the search space, exclude that pos from search
+            if self._color_counter == 1 and isinstance(self.stack_loc,str) and "cube" in self.stack_loc:
+                self._exclude_pos = position.copy()  # if stacking on a cube search space, exclude that pos from search
                 self.blackboard.stack_locations.append(position.copy())
                 return pt.common.Status.RUNNING
             return pt.common.Status.SUCCESS
@@ -321,6 +329,7 @@ class PlaceCube(pt.behaviour.Behaviour):
 
         self.blackboard.picked_up = False
         picked_items = self.blackboard.pickup_history
+        picked_color = picked_items[-1]
 
         if isinstance(self.target_loc, str):
             if self.target_loc == "sort_planes":  # put it on the plane for sorting
@@ -337,26 +346,37 @@ class PlaceCube(pt.behaviour.Behaviour):
                 # update the position of the cube to that of plane pos, careful about z axis
                 self.blackboard.color_pos_dict[color].add(tuple(plane_pos[color]))
                 self.processor.place_cube(plane_pos[color], picked_items.count(color))
-                return pt.common.Status.SUCCESS
 
             elif "cube" in self.target_loc and self.blackboard.in_sequence:  # for stacking on the search space
                 target_color = self.blackboard.color_order
-                target_pos = self.blackboard.color_pos_dict[target_color[0]]
+                if len(target_color)>1:
+                    target_pos = self.blackboard.color_pos_dict[target_color[0]]
+                else:
+                    target_pos = self.blackboard.color_pos_dict[self.target_loc[:-4]]
                 target_pos = list(next(iter(target_pos)))
                 self.processor.place_cube(target_pos, 1 + len(picked_items))
-                picked_color = picked_items[-1]
+                # picked_color = picked_items[-1]
                 self.blackboard.color_pos_dict[picked_color].pop()
                 self.blackboard.color_pos_dict[picked_color].add(tuple(target_pos))
-                return pt.common.Status.SUCCESS
 
             elif self.target_loc == "random":
+                if len(self.blackboard.color_order) > 1:
+                    self.target_loc = self.blackboard.color_order[0]+"_cube"
                 random_pos = self.processor.random_position_generator()
                 self.processor.place_cube(random_pos, len(picked_items))
-                return pt.common.Status.SUCCESS
+                self.blackboard.color_pos_dict[picked_color].pop()
+                self.blackboard.color_pos_dict[picked_color].add(tuple(random_pos))
+
 
             elif self.target_loc in ["red_plane", "blue_plane", "green_plane"]:
                 plane_pos = self.blackboard.plane_pos[self.target_loc[:-6]]
                 self.processor.place_cube(plane_pos, len(picked_items))
+                self.blackboard.color_pos_dict[picked_color].pop()
+                self.blackboard.color_pos_dict[picked_color].add(tuple(plane_pos))
+
+            if len(self.blackboard.color_order) == 1:
+                return pt.common.Status.FAILURE
+            else:
                 return pt.common.Status.SUCCESS
 
         elif isinstance(self.target_loc, int):

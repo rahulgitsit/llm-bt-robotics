@@ -1,0 +1,15 @@
+Grab the green cube.
+Stack the cubes in the order red, blue, green.
+Take the blue cube and stack that cube on the green cube.
+Put a red cube on the storage area.
+Place the green cube on top of the blue cube.
+Pick a blue cube and place that cube on the storage area.
+Take a green cube and put that cube on the blue plane.
+Put the red cube on the green plane.
+Grab a blue cube and stack that cube on another blue cube.
+Place the cube somewhere.
+Pick up a green cube and put that on the green plane.
+Place the blue cube on top of the red cube.
+Pick any cube and put that cube on the red plane.
+On the blue plane place a green cube.
+On the storage area place two blue cubes.

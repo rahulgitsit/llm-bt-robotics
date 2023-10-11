@@ -1,14 +1,12 @@
 import py_trees.common
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
-from actuator import Actuator
-from sensors import Sensors
-from detector import Detector
-from behaviours import *
-from processor import Processor
-from parser import create_tree_from_json
+from src.actuator import Actuator
+from src.sensors import Sensors
+from src.detector import Detector
+from src.processor import Processor
+from llm.parser import *
 import redis
-import json
-from state import SaveState
+from src.state import SaveState
 
 simulation_time = 60 * 60
 
@@ -17,20 +15,21 @@ sim = client.getObject('sim')
 simIK = client.getObject('simIK')
 
 if __name__ == '__main__':
+    # CoppeliaSim variables
     defaultIdleFps = sim.getInt32Param(sim.intparam_idle_fps)
     sim.setInt32Param(sim.intparam_idle_fps, 0)
-
+    planes = [sim.getObject(f'./plate[{i}]') for i in range(3)]
+    storage_plane= sim.getObject('./plate[3]')
     client.setStepping(True)
     sim.startSimulation()
 
+    # init packages
     actuator = Actuator(sim, simIK)
     sensors = Sensors(sim)
     detector = Detector(sim, sensors)
     processor = Processor(sim, actuator, sensors, detector)
-    planes = [sim.getObject(f'./plate[{i}]') for i in range(3)]
 
-    tower_plane = sim.getObject('./plate[3]')
-
+    # init root of the behaviour tree as sequence
     root_test = pt.composites.Sequence(name="Sequence", memory=True)
     state = SaveState()
 
@@ -45,9 +44,13 @@ if __name__ == '__main__':
             print("Listening for commands...")
             if message['type'] == 'message':
                 response_content = message['data'].decode('utf-8')
-                children = create_tree_from_json(response_content, processor=processor, planes=planes,
-                                                 tower_plane=tower_plane)
-
+                #select the parser based on complexity
+                if response_content[-2:] == "l0":
+                    children = parse_json_level0(response_content[:-2], processor=processor, planes=planes,
+                                                              storage_plane=storage_plane)
+                else:
+                    children = parse_json_level2(response_content[:-2], processor=processor, planes=planes,
+                                                 storage_plane=storage_plane)
                 try:
                     root_test.add_children(children)
                     state.restore_state(children)
@@ -55,7 +58,8 @@ if __name__ == '__main__':
                 except TypeError:
                     print("Your command is invalid. Please give a valid command")
 
-                while root_test.status not in [py_trees.common.Status.FAILURE, py_trees.common.Status.INVALID] or program_start:
+                while root_test.status not in [py_trees.common.Status.FAILURE,
+                                               py_trees.common.Status.INVALID] or program_start:
                     program_start = False
                     root_test.tick_once()
                     state.update_state(children)
@@ -66,4 +70,3 @@ if __name__ == '__main__':
     finally:
         sim.stopSimulation()
         sim.setInt32Param(sim.intparam_idle_fps, defaultIdleFps)
-

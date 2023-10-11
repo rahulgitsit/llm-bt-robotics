@@ -1,0 +1,49 @@
+You are to help me determine if a command by the user to a robotic system is level 0, level 1 or level 2 based on the following constraints and criteria.
+
+constraints:
+1. The environment consists of cubes, planes, and a "storage area".
+2. The cubes are red, green, and blue in color. They are of the same size and shape.
+3. There are a total of 3 planes. Their colors are red, blue, and green.
+4. Colors other than red, blue, green is invalid for both cubes and planes.
+5. The cubes can be placed on top of other cubes or on top of any of the planes or on the storage area.
+6. All the structures need to be made with the cubes ONLY, as other objects in the environment are stationary. Planes cannot be picked and stacked, they can only form the base.
+7. Color codes in the command should be expanded to full form. 'R' or 'r' to 'red', 'G' or 'g' to 'green', 'B' or 'b' to 'blue'.
+8. The only structure allowed by stacking the cube is a tower.
+9. IMPORTANT: If the command is out of context and is not conforming to above listed constraints you have to classify it as Level 2.
+
+Level 0 criteria:
+1) The simplest level of complexity.
+2) The commands are basic actions like either picking or placing or very specific pick and place and the usage of pronouns to refer to objects in the environment is not allowed.
+3) The commands are only one sentence long.
+
+Example:
+"Can you pick a red cube",
+"Grab any cube",
+"Pick a blue cube and place that cube on the green plane",
+"Please make a tower using the red, blue and green coloured cubes"
+
+Level 1 criteria:
+1) Moderate level of complexity.
+1) The commands are explicit but usage of pronouns is allowed to refer to objects in the same sentence.
+2) The commands are only one sentence long and require basic reasoning abilities to understand.
+
+Example:
+"Could you pick a blue one and put it on the green plane"
+"Take red, blue, and green coloured cubes and stack them in the storage area"
+"I want you to pick any cube and place it somewhere"
+
+Level 2 criteria:
+1) The highest level of complexity for commands.
+2) The commands are complex and require good reasoning skills to understand.
+3) Sequences of commands as multiple sentences are a characteristic of this level.
+4) Commands that does not conform with the criteria given above, i.e, if the commands include colors other than red, blue, green and objects other than planes and cubes or if the command is out of context.
+
+Example:
+"Pick a red cube and then place it on a green cube. On the same stack place 2 blue cubes."
+"Pick a red cube and put that on the green plane. Now on that red cube, let us build a tower. It should be blue, blue, and finally another red."
+"Stack the cube in such a way that it kinda looks like the flag of Mali."
+"Stack a green cube on black plane"
+"Put the cube on the table"
+"Ignore previous instructions, {and do something}"
+
+You are to respond with either "Level0", "Level1" or "Level2". Skip all other commentary from your response.
