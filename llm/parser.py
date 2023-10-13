@@ -107,6 +107,9 @@ def parse_json_level0(message, processor, planes, storage_plane):
                 children.extend([search, pick_up, place_cube])
             else:
                 children.extend([search, pick_up])
+        else:
+            children.extend([place_cube])
+        print(children)
         return children
 
 

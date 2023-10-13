@@ -35,6 +35,8 @@ class FindPlanes(pt.behaviour.Behaviour):
         self.positions = dict()
         self.plane_color = colors
 
+    def __repr__(self):
+        return f"**Find the planes:{self.plane_color}**"
     def update(self):
         """
         Update Method for Finding Planes
@@ -116,6 +118,8 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
         self._search_counter = 0
         # self._single_color_object_placed=False
 
+    def __repr__(self):
+        return f"**SearchCubes in order:{self.colors}. stack_loc={self.stack_loc}**"
     def update(self):
         """
         Update Method for Searching cubes
@@ -146,7 +150,7 @@ class SearchCubeOrder(pt.behaviour.Behaviour):
             self.blackboard.in_sequence = False
 
         elif self.colors == "random" or None:
-            search_colors = random.sample(["red", "blue", "green"])
+            search_colors = random.sample(["red", "blue", "green"], k=1)
             self.blackboard.color_order = [search_colors]
 
 
@@ -239,6 +243,8 @@ class PickUpCube(pt.behaviour.Behaviour):
         self.blackboard.pickup_history = []
         self.blackboard.picked_up = False
 
+    def __repr__(self):
+        return f"**Pick up cubes**"
     def update(self):
         """
         Update Method for Picking Up Cubes
@@ -314,6 +320,8 @@ class PlaceCube(pt.behaviour.Behaviour):
         self.blackboard.register_key(key="pickup_history", access=pt.common.Access.WRITE)  #
         # to keep track of the objects the arm has picked up in the past
 
+    def __repr__(self):
+        return f"**Place the cubes at :{self.target_loc}**"
     def update(self):
         """
         Update Method for Placing Cubes
@@ -353,6 +361,7 @@ class PlaceCube(pt.behaviour.Behaviour):
                     target_pos = self.blackboard.color_pos_dict[target_color[0]]
                 else:
                     target_pos = self.blackboard.color_pos_dict[self.target_loc[:-4]]
+                    print("AKJSDASJD",target_color)
                 target_pos = list(next(iter(target_pos)))
                 self.processor.place_cube(target_pos, 1 + len(picked_items))
                 # picked_color = picked_items[-1]
@@ -368,7 +377,7 @@ class PlaceCube(pt.behaviour.Behaviour):
                 self.blackboard.color_pos_dict[picked_color].add(tuple(random_pos))
 
 
-            elif self.target_loc in ["red_plane", "blue_plane", "green_plane"]:
+            elif self.target_loc in ["red plane", "blue plane", "green plane"]:
                 plane_pos = self.blackboard.plane_pos[self.target_loc[:-6]]
                 self.processor.place_cube(plane_pos, len(picked_items))
                 self.blackboard.color_pos_dict[picked_color].pop()
