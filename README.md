@@ -5,7 +5,7 @@ Supervisor: [Dr. Giovanni De Gasperis](https://www.disim.univaq.it/GiovanniDeGas
 Author: Rahul Pankajakshan <br>
 
 
-## What's this about?:
+## Description
 This thesis aims to achieve a seamless integration of the Language Model (LLM) with a behavior tree control system, specifically designed for a robotic system operating within the CoppeliaSIM environment. The primary goal is to assess the system's efficiency in handling various levels of command complexity when executing pick and place tasks.
 
 ## Project Structure
