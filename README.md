@@ -1,6 +1,9 @@
 # Master Thesis: Integrating LLMs and Behaviour Trees for Enhanced Robotic Decision-Making
-### Supervisor: Dr. Giovanni De Gasperis
-### Author: Rahul Pankajakshan
+Course: Master Degree in Computer Science
+Department: [DISIM - Dipartimento di Ingegneria e Scienze dell'Informazione e Matematica](https://www.disim.univaq.it/)
+Supervisor: [Dr. Giovanni De Gasperis](https://www.disim.univaq.it/GiovanniDeGasperis/)
+Author: Rahul Pankajakshan
+
 
 ## What's this about?:
 This thesis aims to achieve a seamless integration of the Language Model (LLM) with a behavior tree control system, specifically designed for a robotic system operating within the CoppeliaSIM environment. The primary goal is to assess the system's efficiency in handling various levels of command complexity when executing pick and place tasks.
