@@ -18,12 +18,12 @@ This repository is organized as follows:
 
 - [**prompts**](prompts/): Contains all system prompts used in the experiment.
 
-- [**scene**](scene/): Contains the CoppeliaSim scene file along with the robot and its environment.
+- [**scene**](scene/): Contains the CoppeliaSim scene file with the ABB IRB 4600-40 robot model and its environment. 
 
-- [**src**](src/): Contains various source code files categorized as follows:
-  - [**actuator**](src/actuator.py): Functions and API calls to handle the inverse-kinematics and robot's movement
-  - [**sensor**](src/sensors.py): Function and API calls to deal with camera and proximity sensor
-  - [**detector**](src/detector.py): API calls and helper functions for image processing
-  - [**behaviour**](src/behaviour.py): Behaviours and its definition
-  - [**processor**](src/processor.py): Processor-related source files.
+- [**src**](src/): Contains various source code files categorised as follows:
+  - [**actuator**](src/actuator.py): Functions and API calls to handle the inverse-kinematics and robot's movement.
+  - [**sensor**](src/sensors.py): Function and API calls to deal with camera and proximity sensor.
+  - [**detector**](src/detector.py): API calls and helper functions for image processing.
+  - [**behaviour**](src/behaviour.py): Behaviours and its definition. The control system of the robot.
+  - [**processor**](src/processor.py): Functions to derive execution logic based on user input and perception data.
   - [**state**](src/state.py): State management for the robot and it's environment
