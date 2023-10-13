@@ -1,7 +1,7 @@
 # Master Thesis: Integrating LLMs and Behaviour Trees for Enhanced Robotic Decision-Making
 Course: Master Degree in Computer Science <br>
 Department: [DISIM - Dipartimento di Ingegneria e Scienze dell'Informazione e Matematica](https://www.disim.univaq.it/) <br>
-Supervisor: [Dr. Giovanni De Gasperis](https://www.disim.univaq.it/GiovanniDeGasperis/) <br>
+Supervisor: [Dr. Giovanni De Gasperis](https://www.disim.univaq.it/GiovanniDeGasperis) <br>
 Author: Rahul Pankajakshan <br>
 
 
