@@ -40,6 +40,9 @@ Clone the CoppeliaSim remote API:
 
 based on the remote API [CoppeliaSim forum post](https://forum.coppeliarobotics.com/viewtopic.php?t=9392)
 
+For MacOS users who are facing connectivity issues with zmqRemoteApi, set ```export COPPELIASIM_ROOT_DIR=/Applications/coppeliaSim.app/Contents/Resources``` environment variable.
+based on the [CoppeliaSim forum post](https://forum.coppeliarobotics.com/viewtopic.php?t=10180)
+
 
 
 
