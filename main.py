@@ -1,8 +1,4 @@
 import py_trees.common
-import sys
-
-sys.path.append("./zmqRemoteApi/clients/python/src")
-
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from src.actuator import Actuator
 from src.sensors import Sensors
@@ -11,6 +7,8 @@ from src.processor import Processor
 from llm.parser import *
 import redis
 from src.state import SaveState
+import sys
+sys.path.append("./zmqRemoteApi/clients/python/src")
 
 simulation_time = 60 * 60
 

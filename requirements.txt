@@ -4,3 +4,4 @@ py_trees
 cbor
 pyzmq
 openai
+coppeliasim_zmqremoteapi_client
