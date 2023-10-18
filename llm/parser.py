@@ -119,9 +119,13 @@ def parse_json_level2(data, processor, planes, storage_plane):
     stack_order = []
     print("Parsing the json command...")
     json_data = extract_json_from_string(data)
+    print(json_data)
     try:
-        data = json.loads(json_data)
-        print(data)
+        if json_data:
+            data = json.loads(json_data)
+            print(data)
+        else:
+            return None
     except ValueError:
         print("Invalid command. Command expected in JSON")
         return None
