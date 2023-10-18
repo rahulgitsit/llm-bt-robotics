@@ -4,6 +4,7 @@ import os
 
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
+
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 redis_channel = "json_commands"
 
