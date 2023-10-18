@@ -1,0 +1,6 @@
+redis
+numpy
+py_trees
+cbor
+pyzmq
+openai

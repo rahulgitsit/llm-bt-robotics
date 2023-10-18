@@ -7,9 +7,9 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 redis_channel = "json_commands"
 
-check_level_prompt = open(r".\prompts\check_level_prompt.txt", "r").read()
-l0_l1_prompt = open(r".\prompts\l0_l1_prompt.txt", "r").read()
-l2_prompt = open(r".\prompts\l2_prompt.txt", "r").read()
+check_level_prompt = open("../prompts/check_level_prompt.txt", "r").read()
+l0_l1_prompt = open("../prompts/l0_l1_prompt.txt", "r").read()
+l2_prompt = open("../prompts/l2_prompt.txt", "r").read()
 
 
 def request_gpt(prompt, user_message, temp=0, max_tokens=256):
