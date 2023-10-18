@@ -1,4 +1,8 @@
 import py_trees.common
+import sys
+
+sys.path.append("./zmqRemoteApi/clients/python/src")
+
 from coppeliasim_zmqremoteapi_client import RemoteAPIClient
 from src.actuator import Actuator
 from src.sensors import Sensors
@@ -15,7 +19,7 @@ sim = client.getObject('sim')
 simIK = client.getObject('simIK')
 
 if __name__ == '__main__':
-    # CoppeliaSim variables
+    # CompeliaSim variables
     defaultIdleFps = sim.getInt32Param(sim.intparam_idle_fps)
     sim.setInt32Param(sim.intparam_idle_fps, 0)
     planes = [sim.getObject(f'./plate[{i}]') for i in range(3)]

@@ -27,3 +27,20 @@ This repository is organized as follows:
   - [**behaviour**](src/behaviour.py): Behaviours and its definition. The control system of the robot.
   - [**processor**](src/processor.py): Functions to derive execution logic based on user input and perception data.
   - [**state**](src/state.py): State management for the robot and it's environment
+
+## Install
+
+Install all Python (>=3.10) requirements:
+
+    pip imnstall -r requirements.txt
+
+Clone the CoppeliaSim remote API:
+
+    git clone https://github.com/CoppeliaRobotics/zmqRemoteApi
+
+based on the remote API [CoppeliaSim forum post](https://forum.coppeliarobotics.com/viewtopic.php?t=9392)
+
+
+
+
+
